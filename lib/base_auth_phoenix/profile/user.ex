@@ -2,6 +2,9 @@ defmodule BaseAuthPhoenix.Profile.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @derive {Phoenix.Param, key: :id}
+
   schema "users" do
     field(:email, :string, null: false)
     field(:password, :string, virtual: true)
@@ -14,7 +17,7 @@ defmodule BaseAuthPhoenix.Profile.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :name, :last_name])
+    |> cast(attrs, [:id, :email, :password, :name, :last_name])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
     |> put_crypted_password()
