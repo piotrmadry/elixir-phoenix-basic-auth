@@ -8,6 +8,7 @@ defmodule BaseAuthPhoenix.Router do
   scope "/api/v1", BaseAuthPhoenix do
     pipe_through(:api)
     post("/register", UserController, :register)
+    post("/authorize", AuthController, :authorize_user)
     get("/users", UserController, :index)
   end
 end

@@ -8,6 +8,13 @@ defmodule BaseAuthPhoenix.Profile do
 
   alias BaseAuthPhoenix.Profile.User
 
+  def get_user_by_email(email, password) do
+    case Repo.get_by(User, email: email, crypted_password: password) do
+      nil -> {:error, :not_found}
+      user -> user
+    end
+  end
+
   @doc """
   Returns the list of users.
 
