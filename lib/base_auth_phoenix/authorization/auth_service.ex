@@ -1,17 +1,14 @@
-defmodule BaseAuthPhoenix.Authorization do
+defmodule BaseAuthPhoenix.Authorization.AuthService do
   import Ecto.Query, warn: false
 
   alias BaseAuthPhoenix.Repo
+  alias BaseAuthPhoenix.Profile.UserService
   alias BaseAuthPhoenix.Profile.User
   alias BaseAuthPhoenix.Authorization.AuthTokens
-  alias BaseAuthPhoenix.Profile
 
   def generate_token(%{"email" => email, "password" => password}) do
-    with %User{} = user <-
-           Profile.get_user_by_email(
-             email,
-             Bcrypt.hash_pwd_salt(password)
-           ),
+    with %User{} = user <- UserService.get_user_by_email(email),
+         {:ok, user} <- verify_password(password, user),
          {:ok, tokens} <-
            add_or_update_token(%{
              user_id: user.id,
@@ -23,11 +20,22 @@ defmodule BaseAuthPhoenix.Authorization do
     end
   end
 
-  def generate_token(_), do: {:error, :wrong_credentials}
+  def generate_token(_) do
+    Bcrypt.no_user_verify()
+    {:error, :missing_credentials}
+  end
 
   def add_or_update_token(attrs \\ %{}) do
     %AuthTokens{}
     |> AuthTokens.changeset(attrs)
     |> Repo.insert_or_update(on_conflict: :replace_all, conflict_target: :user_id)
+  end
+
+  def verify_password(password, user) do
+    if Bcrypt.verify_pass(password, user.crypted_password) do
+      {:ok, user}
+    else
+      {:error, :wrong_credentials}
+    end
   end
 end

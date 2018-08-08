@@ -1,7 +1,7 @@
-defmodule BaseAuthPhoenix.UserView do
+defmodule BaseAuthPhoenix.API.UserView do
   use BaseAuthPhoenix.Web, :view
 
-  alias BaseAuthPhoenix.UserView
+  alias BaseAuthPhoenix.API.UserView
 
   def render("index.json", %{users: users}) do
     %{users: render_many(users, UserView, "user.json")}

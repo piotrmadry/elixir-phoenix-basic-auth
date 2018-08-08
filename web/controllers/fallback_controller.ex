@@ -1,7 +1,7 @@
 defmodule BaseAuthPhoenix.FallbackController do
   use BaseAuthPhoenix.Web, :controller
 
-  alias BaseAuthPhoenix.ErrorView
+  alias BaseAuthPhoenix.API.ErrorView
 
   def call(conn, {:error, :not_found}) do
     conn

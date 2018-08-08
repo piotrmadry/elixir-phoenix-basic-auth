@@ -1,13 +1,11 @@
 defmodule BaseAuthPhoenix.AuthController do
   use BaseAuthPhoenix.Web, :controller
 
-  alias BaseAuthPhoenix.Authorization
-  alias BaseAuthPhoenix.AuthView
+  alias BaseAuthPhoenix.Authorization.AuthService
+  alias BaseAuthPhoenix.API.AuthView
 
-  def authorize_user(conn, _params) do
-    with {:ok, body, conn} <- read_body(conn),
-         {:ok, credentials} <- Poison.decode(body) |> IO.inspect(),
-         {:ok, tokens} <- Authorization.generate_token(credentials) do
+  def authorize_user(conn, params) do
+    with {:ok, tokens} <- AuthService.generate_token(params) do
       conn
       |> put_status(200)
       |> render(AuthView, "auth_tokens.json", auth_tokens: tokens)
@@ -15,7 +13,12 @@ defmodule BaseAuthPhoenix.AuthController do
       {:error, :wrong_credentials} ->
         conn
         |> put_status(422)
-        |> json(%{"message" => "dupa"})
+        |> render(AuthView, "wrong_credentials.json")
+
+      {:error, :missing_credentials} ->
+        conn
+        |> put_status(422)
+        |> render(AuthView, "missing_credentials.json")
     end
   end
 end

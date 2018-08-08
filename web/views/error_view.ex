@@ -1,4 +1,4 @@
-defmodule BaseAuthPhoenix.ErrorView do
+defmodule BaseAuthPhoenix.API.ErrorView do
   use BaseAuthPhoenix.Web, :view
 
   def render("global_error.json", %{status: status}) do
